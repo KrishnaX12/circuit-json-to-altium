@@ -1,9 +1,13 @@
 import { describe, expect, test } from "bun:test"
+import { parseAltiumSchDoc, serializeAltiumSheetToSvg } from "altiumts"
+import { convertCircuitJsonToSchematicSvg } from "circuit-to-svg"
+import { CircuitJsonToAltiumConverter } from "../lib"
 import { createSchematicDocument } from "../lib/create-schematic-document"
 import { type CircuitElement, sourceComponent, sourcePort } from "./fixtures"
+import { createSideBySideSvg } from "./fixtures/create-side-by-side-svg"
 
 describe("multi-part schematic components", () => {
-  test("assigns matching Altium part IDs to component units and their records", () => {
+  test("assigns matching Altium part IDs to component units and their records", async () => {
     const circuitJson: CircuitElement[] = [
       sourceComponent("sc_u1", "U1"),
       sourcePort({
@@ -71,5 +75,22 @@ describe("multi-part schematic components", () => {
       expect.stringContaining("OWNERPARTID=2"),
       expect.stringContaining("OWNERPARTID=2"),
     ])
+
+    const converter = new CircuitJsonToAltiumConverter(circuitJson, {
+      projectName: "multi-part-component-units",
+    })
+    converter.runUntilFinished()
+    const firstSchematic = converter.getOutput().schematics[0]
+    if (!firstSchematic) throw new Error("Converter did not create a schematic")
+
+    const circuitJsonSvg = await convertCircuitJsonToSchematicSvg(
+      circuitJson as Parameters<typeof convertCircuitJsonToSchematicSvg>[0],
+    )
+    const altiumSvg = serializeAltiumSheetToSvg(
+      parseAltiumSchDoc(firstSchematic.content),
+    )
+    await expect(
+      createSideBySideSvg(circuitJsonSvg, altiumSvg),
+    ).toMatchSvgSnapshot(import.meta.path, "multi-part-component-units")
   })
 })
