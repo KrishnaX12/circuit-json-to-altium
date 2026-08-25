@@ -5,6 +5,7 @@ import type { CircuitElement, PointTransform } from "./types"
 
 type CreateAltiumSchematicTextRecordFieldsInput = {
   altiumComponentRecordIndex: number
+  altiumPartId: number
   circuitToAltiumSchematicPoint: PointTransform
   fontTable: AltiumSchematicFontTable
   schematicText: CircuitElement
@@ -14,6 +15,7 @@ const ALTIUM_SCHEMATIC_DEFAULT_COLOR = 0x37_29_1f
 
 export function createAltiumSchematicTextRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicPoint,
   fontTable,
   schematicText,
@@ -32,7 +34,7 @@ export function createAltiumSchematicTextRecordFields({
   return [
     "RECORD=4",
     `OWNERINDEX=${altiumComponentRecordIndex}`,
-    "OWNERPARTID=1",
+    `OWNERPARTID=${altiumPartId}`,
     `LOCATION.X=${presentation.position.x}`,
     `LOCATION.Y=${presentation.position.y}`,
     `FONTID=${presentation.fontId}`,

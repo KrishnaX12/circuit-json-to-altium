@@ -6,6 +6,7 @@ import type { CircuitElement, LengthTransform, PointTransform } from "./types"
 
 type CreateAltiumSchematicSymbolPrimitiveRecordFieldsInput = {
   altiumComponentRecordIndex: number
+  altiumPartId: number
   circuitToAltiumSchematicLength: LengthTransform
   circuitToAltiumSchematicPoint: PointTransform
   graphic: CircuitElement
@@ -48,15 +49,20 @@ function getAltiumColor({
 
 function getOwnedGraphicRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicLength,
   graphic,
 }: {
   altiumComponentRecordIndex: number
+  altiumPartId: number
   circuitToAltiumSchematicLength: LengthTransform
   graphic: CircuitElement
 }): string[] {
   return [
-    ...createOwnedSchematicRecordFields(altiumComponentRecordIndex),
+    ...createOwnedSchematicRecordFields(
+      altiumComponentRecordIndex,
+      altiumPartId,
+    ),
     `LINEWIDTH=${getAltiumLineWidth({ circuitToAltiumSchematicLength, graphic })}`,
     `LINESTYLE=${graphic.is_dashed === true ? 1 : 0}`,
   ]
@@ -74,6 +80,7 @@ function getAltiumRadius({
 
 function createPathRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicLength,
   circuitToAltiumSchematicPoint,
   graphic,
@@ -92,6 +99,7 @@ function createPathRecordFields({
     `RECORD=${isFilled ? 7 : 6}`,
     ...getOwnedGraphicRecordFields({
       altiumComponentRecordIndex,
+      altiumPartId,
       circuitToAltiumSchematicLength,
       graphic,
     }),
@@ -112,6 +120,7 @@ function createPathRecordFields({
 
 function createCircleRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicLength,
   circuitToAltiumSchematicPoint,
   graphic,
@@ -127,6 +136,7 @@ function createCircleRecordFields({
     "RECORD=8",
     ...getOwnedGraphicRecordFields({
       altiumComponentRecordIndex,
+      altiumPartId,
       circuitToAltiumSchematicLength,
       graphic,
     }),
@@ -142,6 +152,7 @@ function createCircleRecordFields({
 
 function createArcRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicLength,
   circuitToAltiumSchematicPoint,
   graphic,
@@ -159,6 +170,7 @@ function createArcRecordFields({
     "RECORD=12",
     ...getOwnedGraphicRecordFields({
       altiumComponentRecordIndex,
+      altiumPartId,
       circuitToAltiumSchematicLength,
       graphic,
     }),
@@ -173,6 +185,7 @@ function createArcRecordFields({
 
 function createLineRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicLength,
   circuitToAltiumSchematicPoint,
   graphic,
@@ -189,6 +202,7 @@ function createLineRecordFields({
     "RECORD=13",
     ...getOwnedGraphicRecordFields({
       altiumComponentRecordIndex,
+      altiumPartId,
       circuitToAltiumSchematicLength,
       graphic,
     }),
@@ -202,6 +216,7 @@ function createLineRecordFields({
 
 function createRectRecordFields({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitToAltiumSchematicLength,
   circuitToAltiumSchematicPoint,
   graphic,
@@ -229,6 +244,7 @@ function createRectRecordFields({
     "RECORD=14",
     ...getOwnedGraphicRecordFields({
       altiumComponentRecordIndex,
+      altiumPartId,
       circuitToAltiumSchematicLength,
       graphic,
     }),

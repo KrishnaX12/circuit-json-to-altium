@@ -35,6 +35,7 @@ export type AltiumSchematicSymbolRecords = {
 
 type CreateAltiumSchematicSymbolRecordsOptions = {
   altiumComponentRecordIndex: number
+  altiumPartId: number
   circuitComponentCenter: Point
   circuitToAltiumSchematicPoint: PointTransform
   symbolName: string
@@ -42,6 +43,7 @@ type CreateAltiumSchematicSymbolRecordsOptions = {
 
 export function createAltiumSchematicSymbolRecords({
   altiumComponentRecordIndex,
+  altiumPartId,
   circuitComponentCenter,
   circuitToAltiumSchematicPoint,
   symbolName,
@@ -57,6 +59,7 @@ export function createAltiumSchematicSymbolRecords({
   )
   const symbolMapping: AltiumSchematicSymbolMapping = {
     altiumComponentRecordIndex,
+    altiumPartId,
     circuitToAltiumSchematicPoint,
     symbolToCircuitMatrix,
   }

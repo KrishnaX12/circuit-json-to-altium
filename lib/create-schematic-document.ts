@@ -88,6 +88,21 @@ const ALTIUM_PIN_STANDARD_FLAGS = 0x20
 const ALTIUM_PIN_NAME_VISIBLE_FLAG = 0x08
 const ALTIUM_PIN_DESIGNATOR_VISIBLE_FLAG = 0x10
 const ALTIUM_SCHEMATIC_DEFAULT_COLOR = 0x37_29_1f
+
+function getAltiumPartId(unitName: string): number {
+  const normalizedUnitName = unitName.trim().toUpperCase()
+  if (/^[1-9]\d*$/.test(normalizedUnitName)) {
+    return Number.parseInt(normalizedUnitName, 10)
+  }
+  if (/^[A-Z]+$/.test(normalizedUnitName)) {
+    return [...normalizedUnitName].reduce(
+      (partId, character) =>
+        partId * 26 + character.charCodeAt(0) - "A".charCodeAt(0) + 1,
+      0,
+    )
+  }
+  return 1
+}
 const ALTIUM_PIN_ORIENTATION_BY_FACING_DIRECTION: Record<string, number> = {
   left: 2,
   right: 0,
@@ -461,6 +476,7 @@ export function createSchematicDocument({
     const schematicComponentId = asString(
       schematicComponent.schematic_component_id,
     )
+    const altiumPartId = getAltiumPartId(asString(schematicComponent.unit_name))
     const componentTexts =
       schematicTextsByComponentId.get(schematicComponentId) ?? []
     const designatorText = findSchematicComponentText({
@@ -493,7 +509,7 @@ export function createSchematicDocument({
         "ORIENTATION=0",
         `LIBREFERENCE=${libraryReference}`,
         "SHOWHIDDENPINS=F",
-        "CURRENTPARTID=1",
+        `CURRENTPARTID=${altiumPartId}`,
         "ISMIRRORED=F",
         `UNIQUEID=${sanitizeField(schematicComponent.schematic_component_id)}`,
       ],
@@ -516,6 +532,7 @@ export function createSchematicDocument({
     }).flatMap((graphic) => {
       const recordFields = createAltiumSchematicSymbolPrimitiveRecordFields({
         altiumComponentRecordIndex,
+        altiumPartId,
         circuitToAltiumSchematicLength,
         circuitToAltiumSchematicPoint,
         graphic,
@@ -526,6 +543,7 @@ export function createSchematicDocument({
       customSymbolPrimitiveRecordFields.length === 0
         ? createAltiumSchematicSymbolRecords({
             altiumComponentRecordIndex,
+            altiumPartId,
             circuitComponentCenter,
             circuitToAltiumSchematicPoint,
             symbolName: asString(schematicComponent.symbol_name),
@@ -544,7 +562,7 @@ export function createSchematicDocument({
         [
           "RECORD=14",
           `OWNERINDEX=${altiumComponentRecordIndex}`,
-          "OWNERPARTID=1",
+          `OWNERPARTID=${altiumPartId}`,
           `LOCATION.X=${fallbackSchematicBoxBounds.left}`,
           `LOCATION.Y=${fallbackSchematicBoxBounds.bottom}`,
           `CORNER.X=${fallbackSchematicBoxBounds.right}`,
@@ -696,7 +714,7 @@ export function createSchematicDocument({
         [
           "RECORD=2",
           `OWNERINDEX=${altiumComponentRecordIndex}`,
-          "OWNERPARTID=1",
+          `OWNERPARTID=${altiumPartId}`,
           `DESIGNATOR=${pinDesignator}`,
           `NAME=${pinName}`,
           `PINCONGLOMERATE=${altiumPinConglomerate}`,
@@ -712,6 +730,7 @@ export function createSchematicDocument({
     for (const componentGraphicText of componentGraphicTexts) {
       const recordFields = createAltiumSchematicTextRecordFields({
         altiumComponentRecordIndex,
+        altiumPartId,
         circuitToAltiumSchematicPoint,
         fontTable: altiumSchematicFontTable,
         schematicText: componentGraphicText,

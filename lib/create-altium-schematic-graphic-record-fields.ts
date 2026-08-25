@@ -12,6 +12,7 @@ type SchematicGraphicPrimitive = BoxPrimitive | CirclePrimitive | PathPrimitive
 
 export type AltiumSchematicSymbolMapping = {
   altiumComponentRecordIndex: number
+  altiumPartId: number
   circuitToAltiumSchematicPoint: PointTransform
   symbolToCircuitMatrix: Matrix
 }
@@ -71,6 +72,7 @@ function createAltiumPathRecordFields({
     `RECORD=${pathPrimitive.fill ? 7 : 6}`,
     ...createOwnedSchematicRecordFields(
       symbolMapping.altiumComponentRecordIndex,
+      symbolMapping.altiumPartId,
     ),
     "LINEWIDTH=1",
     `LOCATIONCOUNT=${altiumPathPoints.length}`,
@@ -112,6 +114,7 @@ function createAltiumCircleRecordFields({
     "RECORD=8",
     ...createOwnedSchematicRecordFields(
       symbolMapping.altiumComponentRecordIndex,
+      symbolMapping.altiumPartId,
     ),
     `LOCATION.X=${altiumCenter.x}`,
     `LOCATION.Y=${altiumCenter.y}`,
@@ -151,6 +154,7 @@ function createAltiumBoxRecordFields({
     "RECORD=14",
     ...createOwnedSchematicRecordFields(
       symbolMapping.altiumComponentRecordIndex,
+      symbolMapping.altiumPartId,
     ),
     `LOCATION.X=${altiumFirstCorner.x}`,
     `LOCATION.Y=${altiumFirstCorner.y}`,
@@ -196,10 +200,11 @@ export function transformSchematicSymbolPoint({
 
 export function createOwnedSchematicRecordFields(
   altiumComponentRecordIndex: number,
+  altiumPartId = 1,
 ): string[] {
   return [
     `OWNERINDEX=${altiumComponentRecordIndex}`,
-    "OWNERPARTID=1",
+    `OWNERPARTID=${altiumPartId}`,
     "OWNERPARTDISPLAYMODE=0",
   ]
 }
