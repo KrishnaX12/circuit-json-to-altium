@@ -692,6 +692,10 @@ export function createSchematicDocument({
             })}`,
           ]
         : []
+      const pinSymbolRecordFields = [
+        ...(schematicPort.is_clock === true ? ["SYMBOL_INNEREDGE=3"] : []),
+        ...(schematicPort.is_inverted === true ? ["SYMBOL_OUTEREDGE=1"] : []),
+      ]
       addSchematicRecord(
         [
           "RECORD=2",
@@ -703,6 +707,7 @@ export function createSchematicDocument({
           `LOCATION.X=${altiumPinLocation.x}`,
           `LOCATION.Y=${altiumPinLocation.y}`,
           `PINLENGTH=${altiumPinLength}`,
+          ...pinSymbolRecordFields,
           ...pinColorRecordFields,
           "FONTID=2",
         ],
